@@ -1,20 +1,26 @@
 import React, { Component } from 'react';
-import './randomChar.css';
-import GotService from '../../services/gotService';
+import gotService from '../../services/gotService';
 import Spinner from '../spinner';
 import ErrorMessage from '../errorMessage';
 
-export default class RandomChar extends Component {
-    constructor() {
-        super()
-        this.updateChar()
-    }
+import './randomChar.css';
 
-    gotService = new GotService();
+export default class RandomChar extends Component {
+
+    gotService = new gotService();
     state = {
         char: {},
         loading: true,
         error: false
+    }
+
+    componentDidMount() {
+        this.updateChar()
+        this.timerId = setInterval(this.updateChar, 1500)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerId)
     }
 
     onCharLoaded = (char) => {
@@ -32,9 +38,10 @@ export default class RandomChar extends Component {
     }
 
     updateChar = () => {
-        // const id = Math.floor(Math.random() * 140 + 25); //25-140
-        const id = 1233123;
-        this.gotService.getCharacter(id)
+        const id = Math.floor(Math.random() * 140 + 25); //25-140
+        // const id = 1233123;
+        this.gotService
+            .getCharacter(id)
             .then(this.onCharLoaded)
             .catch(this.onError)
     }
@@ -44,8 +51,8 @@ export default class RandomChar extends Component {
 
         const errorMessage = error ? <ErrorMessage /> : null;
         const spinner = loading ? <Spinner /> : null;
-        const content = !(loading || error) ? <View char={char}/> : null;
-        
+        const content = !(loading || error) ? <View char={char} /> : null;
+
         return (
             <div className="random-block rounded">
                 {errorMessage}
@@ -58,7 +65,7 @@ export default class RandomChar extends Component {
 
 
 const View = ({ char }) => {
-const {name, gender, born, died, culture} = char;
+    const { name, gender, born, died, culture } = char;
 
     return (
         <>
